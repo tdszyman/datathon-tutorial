@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, send_file
 import pandas as pd
 import sqlite3
 
@@ -12,6 +12,11 @@ def index():
 
 @app.route('/heatmap')
 def heatmap():
+    import io
+    import pandas as pd
+    import sqlite3
+    import seaborn as sns
+    from matplotlib import pyplot as plt
     con = sqlite3.connect('data/database')
     df = pd.read_sql("""
     SELECT 
@@ -26,5 +31,10 @@ def heatmap():
     ;
     """,
     con).set_index(['age', 'education_num'])
-    print(df.head())
-    return df.to_html()
+    heat = df.value.unstack().fillna(0).T.sort_index(ascending=False)
+    heat = heat / heat.sum(axis=0)  # Normalize based on age
+    _ = sns.heatmap(heat)
+    fakefile = io.BytesIO()
+    plt.savefig(fakefile)
+    fakefile.seek(0)
+    return send_file(fakefile, mimetype='image/gif')
