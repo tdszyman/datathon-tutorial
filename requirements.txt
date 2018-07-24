@@ -1,3 +1,5 @@
 flask
 pandas
 requests
+matplotlib
+seaborn
