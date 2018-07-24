@@ -33,6 +33,7 @@ def heatmap():
     con).set_index(['age', 'education_num'])
     heat = df.value.unstack().fillna(0).T.sort_index(ascending=False)
     heat = heat / heat.sum(axis=0)  # Normalize based on age
+    plt.clf()
     _ = sns.heatmap(heat)
     fakefile = io.BytesIO()
     plt.savefig(fakefile)
