@@ -6,22 +6,32 @@ Terrence.Szymanski@anz.com
 
 ## Quickstart
 
+Download and install dependencies:
+
     git clone git@github.com:tdszyman/datathon-tutorial.git
     virtualenv venv
     source venv/bin/activate
     pip install -r requirements.txt
+    
+Run the pipeline to download the data and build the database:
+
+    python pipeline.py
+
+Run the webserver:
+
     ./run.sh
+    
+You should then be able to view the app at <http://localhost:5000>.
 
 ## Contents
+    
+`$ tree -I "data|venv|__pycache__" .`
 
     .
     ├── Dockerfile
     ├── Readme.md
     ├── awesomeapp
     │   ├── __init__.py
-    │   ├── __pycache__
-    │   │   ├── __init__.cpython-36.pyc
-    │   │   └── api.cpython-36.pyc
     │   ├── api.py
     │   ├── static
     │   │   ├── css
@@ -37,8 +47,7 @@ Terrence.Szymanski@anz.com
     │   └── templates
     │       ├── base.html
     │       └── index.html
-    ├── data
-    │   └── datafile.csv
     ├── pipeline.py
     ├── requirements.txt
     └── run.sh
+
