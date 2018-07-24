@@ -38,4 +38,4 @@ def heatmap():
     fakefile = io.BytesIO()
     plt.savefig(fakefile)
     fakefile.seek(0)
-    return send_file(fakefile, mimetype='image/gif')
+    return send_file(fakefile, mimetype='image/png')
