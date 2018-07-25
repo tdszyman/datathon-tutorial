@@ -10,8 +10,8 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/heatmap')
-def heatmap():
+@app.route('/heatmap_png')
+def heatmap_png():
     import io
     import pandas as pd
     import sqlite3
@@ -39,3 +39,28 @@ def heatmap():
     plt.savefig(fakefile)
     fakefile.seek(0)
     return send_file(fakefile, mimetype='image/png')
+
+
+
+@app.route('/heatmap_json')
+def heatmap_json():
+    import io
+    import pandas as pd
+    import sqlite3
+    import seaborn as sns
+    from matplotlib import pyplot as plt
+    con = sqlite3.connect('data/database')
+    df = pd.read_sql("""
+    SELECT 
+      age,
+      education_num,
+      SUM(fnlwgt) as value
+    FROM adult
+      WHERE sex = 'Female'
+    GROUP BY
+      age,
+      education_num
+    ;
+    """,
+    con)
+    return df.to_json(orient='records')

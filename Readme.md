@@ -6,6 +6,8 @@ Terrence.Szymanski@anz.com
 
 ## Quickstart
 
+Before you start, you should have Python (3.6 or greater) installed, as well as virtualenv (`pip install virtualenv`).
+
 Download and install dependencies:
 
     git clone git@github.com:tdszyman/datathon-tutorial.git
