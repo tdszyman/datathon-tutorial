@@ -40,6 +40,11 @@ def heatmap():
     elif format == 'json':
         return df.to_json(orient='records')
     elif format == 'png':
+        import matplotlib
+        matplotlib.use('AGG')
+        from matplotlib import pyplot as plt
+        import seaborn as sns
+        df = df.set_index(['age', 'education_num'])
         heat = df.value.unstack().fillna(0).T.sort_index(ascending=False)
         heat = heat / heat.sum(axis=0)  # Normalize based on age
         plt.clf()
