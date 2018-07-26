@@ -2,6 +2,7 @@ import os
 import requests
 import sqlite3
 import pandas as pd
+from pathlib import Path
 
 
 data_url = "https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data"
@@ -24,38 +25,45 @@ data_cols = [
 ]
 
 data_fn = "./data/adult.csv"
+data_fn = Path(data_fn)
 
 db_fn = "./data/database"
+db_fn = Path(db_fn)
 
+data_folder = "./data"
+data_folder = Path(data_folder)
 
 def download_data():
-    with open(data_fn, "wb") as f:
+    with open(data_fn.absolute(), "wb") as f:
         f.write(requests.get(data_url).content)
 
 
 def create_database():
-    os.remove(db_fn)
-    con = sqlite3.connect(db_fn)
+    if(db_fn.is_file()):
+        os.remove(db_fn.absolute())
+    con = sqlite3.connect(str(db_fn.absolute()))
     con.close()
     return
 
 
 def load_data():
-    df = pd.read_csv(data_fn, index_col=None)
+    df = pd.read_csv(data_fn.absolute(), index_col=None)
     df.columns = [col[0] for col in data_cols]
     for col, type in data_cols:
         df[col] = df[col].astype(type)
         if type == 'object':
             df[col] = df[col].str.strip()
     print(df.head())
-    con = sqlite3.connect(db_fn)
+    con = sqlite3.connect(str(db_fn.absolute()))
     df.to_sql('adult', con=con, index=False)
     con.close()
     return
 
 
 def main():
-    #download_data()
+    if( not data_folder.is_dir()):
+        os.makedirs(data_folder.absolute())
+    download_data()
     create_database()
     load_data()
     return
