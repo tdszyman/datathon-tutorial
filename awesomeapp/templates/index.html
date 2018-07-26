@@ -8,7 +8,19 @@
 
 <p> this is awesome app!</p>
 
-<p>This image comes from the API we built:</p>
-<img src="/heatmap" />
+<div class="row">
+    <div class="col-sm">
+        <p>PNG image:</p>
+        <img src="/api/heatmap/png" />
+    </div>
+    <div class="col-sm">
+        <p>HTML:</p>
+        <div id="heatmap-html"></div>
+    </div>
+    <div class="col-sm">
+        <p>JSON:</p>
+        <div id="heatmap-json"></div>
+    </div>
+</div>
 
 {% endblock %}
