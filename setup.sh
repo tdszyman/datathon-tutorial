@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-pip -V >nul 2>nul || (echo failed to find pip)
+pip -V >/dev/null 2>/dev/null || (echo failed to find pip)
 echo
 echo
 echo ##########################################
