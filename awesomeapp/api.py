@@ -1,10 +1,8 @@
-import io
-import pandas as pd
-import sqlite3
 from flask import Flask, render_template, jsonify, send_file, request, abort
 import pandas as pd
 import sqlite3
-
+import traceback
+import json
 
 app = Flask(__name__)
 
@@ -14,46 +12,65 @@ database_path = 'data/database'
 def index():
     return render_template('index.html')
 
+@app.route('/api/education')
+def getEducationController():
+    try:
+        limit = int(request.args.get('limit', 0))
+    except Exception as e:
+        return abort(400)
+    try:
+        df = getEducationTable(limit)
+        meta = getEducationMetadata()
+        return json.dumps( {
+            # little bit of a hack because df.to_dict doesn't play nice with json encoding
+            "data": json.loads(df.to_json(orient='records')),
+            "metadata": json.loads(meta.to_json(orient="records"))
+        } )
+    except Exception as e:
+        return abort(500)  # internal server error
 
-@app.route('/api/heatmap')
-def heatmap():
-    format = request.args.get('format', default='html')
-    limit = request.args.get('limit', default=None)
+# separates the request end point from the data retrieval logic
+def getEducationTable(limit):
+    # gets data from server
     con = sqlite3.connect('data/database')
     df = pd.read_sql("""
-    SELECT 
-      age,
-      education_num,
-      SUM(fnlwgt) as value
-    FROM adult
-      WHERE sex = 'Female'
-    GROUP BY
-      age,
-      education_num
-    ;
-    """,
+        SELECT 
+          age,
+          education_num,
+          SUM(fnlwgt) as value
+        FROM adult
+          WHERE sex = 'Female'
+        GROUP BY
+          age,
+          education_num
+        ;
+        """,
     con)
-    if limit is not None:
-        df = df.head(int(limit))
-    if format == 'html':
-        return df.to_html()
-    elif format == 'json':
-        return df.to_json(orient='records')
-    elif format == 'png':
-        import matplotlib
-        matplotlib.use('AGG')
-        from matplotlib import pyplot as plt
-        import seaborn as sns
-        df = df.set_index(['age', 'education_num'])
-        heat = df.value.unstack().fillna(0).T.sort_index(ascending=False)
-        heat = heat / heat.sum(axis=0)  # Normalize based on age
-        plt.clf()
-        _ = sns.heatmap(heat)
-        fakefile = io.BytesIO()
-        plt.savefig(fakefile)
-        fakefile.seek(0)
-        return send_file(fakefile, mimetype='image/png')
-    else:
-        # Bad request
-        return abort(400)
+    if limit != 0:
+        df = df.head(limit)
+    return df
 
+def getEducationMetadata():
+    con = sqlite3.connect('data/database')
+    df = pd.read_sql("""
+        SELECT
+            MIN(age) as min_age,
+            MAX(age) as max_age,
+            MIN(education_num) as min_education_num,
+            MAX(education_num) as max_education_num,
+            MIN(value) as min_value,
+            Max(value) as max_value
+        FROM
+            (
+                SELECT 
+                  age,
+                  education_num,
+                  SUM(fnlwgt) as value
+                FROM adult
+                  WHERE sex = 'Female'
+                GROUP BY
+                  age,
+                  education_num
+            )
+    """, con)
+    return df
