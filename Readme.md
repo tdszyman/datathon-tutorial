@@ -25,6 +25,16 @@ Run the webserver:
     
 You should then be able to view the app at <http://localhost:5000>.
 
+
+## Running the Dockerfile locally
+
+    docker build -t datathon .
+    docker run -p 5000:5000 datathon
+
+## Deploying to Elastic Beanstalk
+
+https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/docker-singlecontainer-deploy.html#docker-singlecontainer-pythonsample
+
 ## Contents
     
 `$ tree -I "data|venv|__pycache__" .`

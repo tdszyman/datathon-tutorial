@@ -1,10 +1,7 @@
-import io
-import pandas as pd
+import json
 import sqlite3
-from flask import Flask, render_template, jsonify, send_file, request, abort
 import pandas as pd
-import sqlite3
-
+from flask import Flask, render_template, jsonify, request
 
 app = Flask(__name__)
 
@@ -14,57 +11,39 @@ database_path = 'data/database'
 def index():
     return render_template('index.html')
 
+
+@app.route('/api/heatmap')
+def getHeatmapController():
+    df = getEducationTable()
+    df = df.set_index(['age', 'education_num'])
+    heat = df.value.unstack().fillna(0).T.sort_index(ascending=False)
+    heat = heat / heat.sum(axis=0)  # Normalize based on age
+    return jsonify(heat.values.tolist())
+
+
 @app.route('/api/education')
 def getEducationController():
-    try:
-        limit = int(request.args.get('limit', 0))
-    except Exception as e:
-        return abort(400)
-    try:
-        df = getEducationTable(limit)
-        meta = getEducationMetadata()
-        return json.dumps( {
-            # little bit of a hack because df.to_dict doesn't play nice with json encoding
-            "data": json.loads(df.to_json(orient='records')),
-            "metadata": json.loads(meta.to_json(orient="records"))
-        } )
-    except Exception as e:
-        return abort(500)  # internal server error
+    limit = int(request.args.get('limit', 0))
+    df = getEducationTable(limit)
+    meta = getEducationMetadata()
+    return json.dumps({
+        # little bit of a hack because df.to_dict doesn't play nice with json encoding
+        "data": json.loads(df.to_json(orient='records')),
+        "metadata": json.loads(meta.to_json(orient="records"))
+    })
+
 
 @app.route('/api/top')
 def getEducationTopController():
-    try:
-        num = int(request.args.get('num', 10))
-    except Exception as e:
-        return abort(400)
-    try:
-        df = getEducationTopTable(num)
-        return df.to_json(orient="records")
-    except Exception as e:
-        return abort(500)
+    num = int(request.args.get('num', 0))
+    df = getEducationTopTable(num).sort_values('age')
+    return df.to_html(border="", index=None)
 
-def getEducationTopTable(num):
-    con = sqlite3.connect('data/database')
-    df = pd.read_sql("""
-            SELECT 
-              age,
-              MAX(education_num) as education_num,
-              SUM(fnlwgt) as value
-            FROM adult
-              WHERE sex = 'Female'
-            GROUP BY
-              age
-            ORDER BY
-                value DESC
-            ;
-            """,
-                     con)
-    return df.head(num)
 
-# separates the request end point from the data retrieval logic
-def getEducationTable(limit):
-    # gets data from server
-    con = sqlite3.connect('data/database')
+# Functions to read data from the database into Pandas DataFrames.
+
+def getEducationTable(limit=0):
+    con = sqlite3.connect(database_path)
     df = pd.read_sql("""
         SELECT 
           age,
@@ -82,8 +61,9 @@ def getEducationTable(limit):
         df = df.head(limit)
     return df
 
+
 def getEducationMetadata():
-    con = sqlite3.connect('data/database')
+    con = sqlite3.connect(database_path)
     df = pd.read_sql("""
         SELECT
             MIN(age) as min_age,
@@ -106,6 +86,26 @@ def getEducationMetadata():
             )
     """, con)
     return df
+
+
+def getEducationTopTable(num):
+    con = sqlite3.connect('data/database')
+    df = pd.read_sql("""
+            SELECT 
+              age,
+              MAX(education_num) as education_num,
+              SUM(fnlwgt) as value
+            FROM adult
+              WHERE sex = 'Female'
+            GROUP BY
+              age
+            ORDER BY
+                value DESC
+            ;
+            """,
+                     con)
+    return df.head(num)
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
