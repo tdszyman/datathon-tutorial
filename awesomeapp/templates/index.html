@@ -9,7 +9,34 @@
 <p> this is awesome app!</p>
 
 <div class="row">
-    <div id="chartDiv"/>
+    <div class="col-xs-6">
+        <div id="chartDiv">
+        </div>
+    </div>
+    <div class="col-xs-6">
+        <table class="table hidden age-table">
+            <thead>
+                <tr>
+                    <th scope="col">age</th>
+                    <th scope="col">education</th>
+                    <th scope="col">value</th>
+                </tr>
+                <tbody class="table-body">
+
+                </tbody>
+            </thead>
+        </table>
+    </div>
+</div>
+
+<div class="table-row template">
+    <table>
+        <tr>
+            <th scope="col">{age}</th>
+            <td>{education}</td>
+            <td>{value}</td>
+        </tr>
+    </table>
 </div>
 
 {% endblock %}

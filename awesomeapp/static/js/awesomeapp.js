@@ -39,8 +39,6 @@ $(document).ready(function() {
             graph_data[Number(data[i].age) - Number(meta.min_age)]["value"  + data[i].education_num] = data[i].value;
         }
 
-        console.log(graph_data);
-
         for(var i = 0; i < meta.max_education_num; i++){
             graphs.push({
                 "fillAlphas": 1,
@@ -59,7 +57,7 @@ $(document).ready(function() {
                 "axisAlpha": 0.3,
                 "gridAlpha": 0,
                 "maximum": meta.max_education_num,
-                //"minimum": meta.min_education_num
+                "minimum": meta.min_education_num
               }],
               "graphs": graphs,
               "columnWidth": 1,
@@ -71,6 +69,33 @@ $(document).ready(function() {
                 "position": "left"
               }
         });
+
+    })
+
+    $.ajax("/api/top",
+        {
+            data: {
+                num: 10
+            },
+            method: "GET"
+        }
+    ).done(r => {
+        r = JSON.parse(r);
+        var data = r;
+
+        var table_row = $(".table-row").find("table").find("tbody").find("tr").clone();
+        console.log(table_row);
+        for(var i = 0; i < data.length; i++){
+            var new_row = table_row.clone();
+            var html = new_row.html();
+            html = html.replace("{age}", data[i].age);
+            html = html.replace("{education}", data[i].education_num);
+            html = html.replace("{value}", data[i].value);
+            new_row.html(html);
+            $(".table-body").append(new_row);
+        }
+
+        $(".table").removeClass("hidden");
 
     })
 });

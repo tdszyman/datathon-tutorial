@@ -29,6 +29,36 @@ def getEducationController():
     except Exception as e:
         return abort(500)  # internal server error
 
+@app.route('/api/top')
+def getEducationTopController():
+    try:
+        num = int(request.args.get('num', 10))
+    except Exception as e:
+        return abort(400)
+    try:
+        df = getEducationTopTable(num)
+        return df.to_json(orient="records")
+    except Exception as e:
+        return abort(500)
+
+def getEducationTopTable(num):
+    con = sqlite3.connect('data/database')
+    df = pd.read_sql("""
+            SELECT 
+              age,
+              MAX(education_num) as education_num,
+              SUM(fnlwgt) as value
+            FROM adult
+              WHERE sex = 'Female'
+            GROUP BY
+              age
+            ORDER BY
+                value DESC
+            ;
+            """,
+                     con)
+    return df.head(num)
+
 # separates the request end point from the data retrieval logic
 def getEducationTable(limit):
     # gets data from server

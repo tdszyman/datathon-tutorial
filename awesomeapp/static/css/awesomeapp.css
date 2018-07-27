@@ -10,3 +10,15 @@ body {
     height: 500px;
     width: 500px;
 }
+
+.template{
+    display: none;
+}
+
+.hidden{
+    display: none;
+}
+
+.age-table{
+    width: 300px;
+}
