@@ -5,3 +5,20 @@ body {
 .main-content {
   padding: 3rem 1.5rem;
 }
+
+#chartDiv {
+    height: 500px;
+    width: 500px;
+}
+
+.template{
+    display: none;
+}
+
+.hidden{
+    display: none;
+}
+
+.age-table{
+    width: 300px;
+}
