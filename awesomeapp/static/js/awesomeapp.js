@@ -18,10 +18,19 @@ $(document).ready(function() {
 
     // Put the table on the page
     $.get(
-       "/api/top?num=8",
+       "/api/levels",
        function(data) {
-           $("#top-div").html(data);
-           $("#top-div table").addClass("table-striped");
+           $("#levels-div").html(data);
+           $("#levels-div table").addClass("table-striped");
+       }
+    );
+
+    // Put the table on the page
+    $.get(
+       "/api/summary",
+       function(data) {
+           $("#summary-div").html(data);
+           $("#summary-div table").addClass("table-striped");
        }
     );
 
