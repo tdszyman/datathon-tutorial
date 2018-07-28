@@ -49,3 +49,38 @@ You can run these commands to deploy the app:
 
     eb init
     eb create dev-env
+
+## File Contents
+
+    $ tree -I "data|venv|__pycache__" .
+
+    .
+    ├── Dockerfile
+    ├── Dockerrun.aws.json
+    ├── Readme.md
+    ├── awesomeapp
+    │   ├── __init__.py
+    │   ├── api.py
+    │   ├── static
+    │   │   ├── css
+    │   │   │   ├── awesomeapp.css
+    │   │   │   └── bootstrap.css
+    │   │   ├── img
+    │   │   │   └── datathonLogoPB.png
+    │   │   └── js
+    │   │       ├── awesomeapp.js
+    │   │       ├── bootstrap.bundle.js
+    │   │       ├── jquery.js
+    │   │       └── plotly-latest.min.js
+    │   └── templates
+    │       ├── base.html
+    │       └── index.html
+    ├── deploy_eb.sh
+    ├── notebooks
+    │   └── Education\ Heatmap.ipynb
+    ├── pipeline.py
+    ├── requirements.txt
+    ├── run.bat
+    ├── run.sh
+    ├── setup.bat
+    └── setup.sh
